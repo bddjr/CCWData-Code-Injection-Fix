@@ -1,5 +1,65 @@
 /*! For license information please see scratch3_ccw_data.cbf43b4e.js.LICENSE.txt */
 "use strict";
+
+/* Init iframe sandbox */
+{
+    const i = document.createElement("iframe");
+    i.style.display = "none";
+    i.src = "about:blank";
+    document.body.appendChild(i);
+    self.ccwdataExtensionSafeEval = i.contentWindow.eval(`
+        ((myEval) => {
+            "use strict";
+            const { stringify } = JSON;
+            const { isArray } = Array;
+            function cloneInputObj(input) {
+                if (input == null) return input;
+                switch (typeof input) {
+                    case "object":
+                        const out = isArray(input) ? [] : {};
+                        for (const key in input) {
+                            out[key] = cloneInputObj(input[key]);
+                        }
+                        return out;
+                    case "string":
+                    case "number":
+                    case "boolean":
+                        return input;
+                }
+                return '' + input;
+            };
+            return {
+                window,
+                getValueInJSON: (js, jsonObj, _typeof) => {
+                    "use strict";
+                    js += '';
+                    jsonObj = cloneInputObj(jsonObj);
+                    var rtObj = myEval(js, jsonObj);
+                    if ("object" === _typeof(rtObj)) return stringify(rtObj);
+                    switch (typeof rtObj) {
+                        case "string":
+                        case "number":
+                        case "boolean":
+                        case "undefined":
+                            return rtObj;
+                    }
+                    return '' + rtObj;
+                },
+                setValueInJSON: (js, jsonObj, valueObj) => {
+                    "use strict";
+                    js += '';
+                    jsonObj = cloneInputObj(jsonObj);
+                    valueObj = cloneInputObj(valueObj);
+                    myEval(js, jsonObj, valueObj);
+                    return stringify(jsonObj);
+                }
+            };
+        })((js, jsonObj, valueObj) => eval(js))
+    `);
+    /* 务必移除iframe，防止沙盒逃逸 */
+    document.body.removeChild(i);
+};
+
 (self.webpackChunkscratch_extensions = self.webpackChunkscratch_extensions || []).push([[194], {
     12960: (e, t, r) => {
         r.d(t, {
@@ -2018,19 +2078,28 @@
                     }
                     if (/[()=]/gm.test(key))
                         return "error: invalid key ".concat(key, ", cannot contain ()=");
-                    var key2 = "jsonObj[".concat(key, "]"), rtObj;
-                    Array.isArray(jsonObj) ? key = key.startsWith("[") ? "jsonObj".concat(key) : "jsonObj[".concat(key, "]") : /\s/gm.test(key) ? (console.warn("[CCW Data] warning: invalid key ".concat(key, ", space and dot cannot be used together")),
-                    key = 'jsonObj["'.concat(key, '"]')) : key = "jsonObj.".concat(key);
-                    try {
-                        rtObj = eval(key)
-                    } catch (e) {
+                    const keyRaw = key;
+                    Array.isArray(jsonObj)
+                        ? key = key.startsWith("[")
+                            ? "jsonObj".concat(key)
+                            : ""
+                        : /\s/gm.test(key)
+                            ? (
+                                console.warn("[CCW Data] warning: invalid key ".concat(key, ", space and dot cannot be used together")),
+                                key = ""
+                            ) : key = "jsonObj.".concat(key);
+                    if (key) {
                         try {
-                            rtObj = eval(key2)
-                        } catch (e) {
-                            return "error: key or expression invalid"
-                        }
+                            /* Use iframe sandbox */
+                            return window.ccwdataExtensionSafeEval.getValueInJSON(key, jsonObj, _typeof)
+                        } catch (e) {}
                     }
-                    return "object" === _typeof(rtObj) ? JSON.stringify(rtObj) : rtObj
+                    try {
+                        var rtObj = jsonObj[keyRaw];
+                        return "object" === _typeof(rtObj) ? JSON.stringify(rtObj) : rtObj;
+                    } catch (e) {
+                        return "error: key or expression invalid"
+                    }
                 }
             }, {
                 key: "_findValueByKeyString",
@@ -2097,13 +2166,14 @@
                         } catch (e) {}
                     "string" == typeof valueObj && /^-?\d*\.?\d*$/gm.test(valueObj) && (valueObj = Number(valueObj));
                     try {
-                        Array.isArray(jsonObj) ? jsonObj[key] = valueObj : /[\.\[\]]/gm.test(key) ? (valueObj instanceof Object ? (valueObj = JSON.stringify(valueObj),
-                        valueObj = "JSON.parse('".concat(valueObj, "')")) : "string" == typeof valueObj && (valueObj = "'".concat(valueObj, "'")),
-                        eval("jsonObj.".concat(key, " = ").concat(valueObj))) : jsonObj[key] = valueObj
+                        /* Use iframe sandbox */
+                        if (!Array.isArray(jsonObj) && /[\.\[\]]/gm.test(key))
+                            return window.ccwdataExtensionSafeEval.setValueInJSON("jsonObj.".concat(key, " =valueObj"), jsonObj, valueObj);
+                        jsonObj[key] = valueObj;
+                        return JSON.stringify(jsonObj)
                     } catch (e) {
                         return "error: key or expression invalid"
                     }
-                    return JSON.stringify(jsonObj)
                 }
             }, {
                 key: "setValueInJSON_2",
