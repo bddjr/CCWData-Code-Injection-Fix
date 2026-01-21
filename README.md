@@ -6,10 +6,12 @@ https://github.com/bddjr/CCWData-Code-Injection-Fix/compare/compare^...compare
 安装TamperMonkey，然后访问这个链接安装脚本，即可修复Gandi云数据扩展的代码注入(Code injection)漏洞：   
 https://bddjr.github.io/CCWData-Code-Injection-Fix/CCWData-Code-Injection-Fix.user.js  
 
-> [!WARNING] 脚本的副作用
+> [!WARNING]
+> 脚本的副作用：  
 > 因为该脚本修复了漏洞，所以可能会被部分作品误认为使用了某安全审计工具。  
 
-> [!TIP] 您可能需要   
+> [!TIP]
+> 您可能需要：   
 > CCW代码注入风险警告，让你的账号更安全。  
 > https://github.com/bddjr/CCW-Code-Injection-Risk-Warning  
 
