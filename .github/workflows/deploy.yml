@@ -46,3 +46,30 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  push-branch-compare:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: push
+        run: |
+          rm -rf branch-compare
+          git init branch-compare
+          cd branch-compare
+          git config user.name $GITHUB_ACTOR
+          git config user.email $GITHUB_ACTOR@users.noreply.github.com
+          git branch -m compare
+          cp ../scratch3_ccw_data.cbf43b4e.PrettyPrint.before.js scratch3_ccw_data.cbf43b4e.PrettyPrint.js
+          git add .
+          git commit -m "before"
+          cp -f ../scratch3_ccw_data.cbf43b4e.PrettyPrint.js ./
+          git add .
+          git commit -m "Fix CCWData code injection security vulnerability"
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git push -u origin compare -f
