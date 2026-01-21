@@ -22,13 +22,18 @@ const version = ''.concat(
     d.getUTCSeconds().toString().padStart(2, '0')
 )
 
-const ccwdata = fs.readFileSync(resolve('../scratch3_ccw_data.cbf43b4e.PrettyPrint.js')).toString()
+let ccwdata = fs.readFileSync(resolve('../scratch3_ccw_data.cbf43b4e.PrettyPrint.js')).toString()
+
+ccwdata = ccwdata.replace(
+    /[`\\]|$\{|<\/script/g,
+    m => (m == '</script' ? '<\\/script' : '\\' + m)
+)
 
 let script = fs.readFileSync(resolve('./CCWData-Code-Injection-Fix.user.js')).toString()
 
 script = script
     .replace('{{version}}', version)
-    .replace('"{{script}}"', JSON.stringify(ccwdata))
+    .replace('{{script}}', ccwdata)
 
 const distPath = resolve('../dist')
 
