@@ -1,8 +1,12 @@
-/*! For license information please see scratch3_ccw_data.cbf43b4e.js.LICENSE.txt */
+/*! For license information please see https://static.xiguacity.cn/h1t86b7fg6c7k36wnt0cb30m/static/js/scratch3_ccw_data.cbf43b4e.js.LICENSE.txt */
 "use strict";
 
-/* Init iframe sandbox */
 {
+    /**
+     * CCWData-Code-Injection-Fix
+     * @author bddjr
+     * @license https://unlicense.org
+     */
     const i = document.createElement("iframe");
     i.style.display = "none";
     i.src = "about:blank";
