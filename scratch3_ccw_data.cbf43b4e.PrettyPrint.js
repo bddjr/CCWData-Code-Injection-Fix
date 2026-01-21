@@ -7,18 +7,20 @@
     i.style.display = "none";
     i.src = "about:blank";
     document.body.appendChild(i);
-    self.ccwdataExtensionSafeEval = i.contentWindow.eval(`
+    const ccwdataExtensionSafeEval = i.contentWindow.eval(`
         ((myEval) => {
             "use strict";
             const { stringify } = JSON;
             const { isArray } = Array;
-            function cloneInputObj(input) {
+            function cloneInputObj(input, copiedObj = (new Map)) {
                 if (input == null) return input;
                 switch (typeof input) {
                     case "object":
+                        if (copiedObj.has(input)) return copiedObj.get(input);
                         const out = isArray(input) ? [] : {};
+                        copiedObj.set(input, out);
                         for (const key in input) {
-                            out[key] = cloneInputObj(input[key]);
+                            out[key] = cloneInputObj(input[key], copiedObj);
                         }
                         return out;
                     case "string":
@@ -58,6 +60,7 @@
     `);
     /* 务必移除iframe，防止沙盒逃逸 */
     document.body.removeChild(i);
+    window.ccwdataExtensionSafeEval = ccwdataExtensionSafeEval;
 };
 
 (self.webpackChunkscratch_extensions = self.webpackChunkscratch_extensions || []).push([[194], {
