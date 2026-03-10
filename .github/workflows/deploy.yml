@@ -57,19 +57,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: push
+      - name: script
+        env:
+          BRANCH: compare
+          DIR: .branch-compare
         run: |
-          rm -rf branch-compare
-          git init branch-compare
-          cd branch-compare
+          rm -rf $DIR
+          git init -b $BRANCH $DIR
+          cd $DIR
           git config user.name $GITHUB_ACTOR
           git config user.email $GITHUB_ACTOR@users.noreply.github.com
-          git branch -m compare
-          cp ../scratch3_ccw_data.cbf43b4e.PrettyPrint.before.js scratch3_ccw_data.cbf43b4e.PrettyPrint.js
+          cp ../20260309.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.e7237e1f.prettyprint.js
           git add .
           git commit -m "before"
-          cp -f ../scratch3_ccw_data.cbf43b4e.PrettyPrint.js ./
+          cp -f ../fix.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.e7237e1f.prettyprint.js
           git add .
-          git commit -m "Fix CCWData code injection security vulnerability"
+          git commit -m "fix"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git push -u origin compare -f
+          git push origin $BRANCH -f

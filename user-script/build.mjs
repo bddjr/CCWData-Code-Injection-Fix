@@ -22,10 +22,10 @@ const version = ''.concat(
     d.getUTCSeconds().toString().padStart(2, '0')
 )
 
-let ccwdata = fs.readFileSync(resolve('../scratch3_ccw_data.cbf43b4e.PrettyPrint.js')).toString()
+let ccwdata = fs.readFileSync(resolve('../fix.scratch3_ccw_data.e7237e1f.prettyprint.js')).toString()
 
 ccwdata = ccwdata.replace(
-    /[`\\]|$\{|<\/script/g,
+    /[`\\]|\$\{|<\/script/g,
     m => (m == '</script' ? '<\\/script' : '\\' + m)
 )
 

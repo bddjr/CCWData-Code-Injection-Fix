@@ -1,5 +1,5 @@
 如何修复“Gandi云数据”扩展的代码注入(Code injection)漏洞：  
-https://github.com/bddjr/CCWData-Code-Injection-Fix/compare/compare^...compare
+https://github.com/bddjr/CCWData-Code-Injection-Fix/compare/compare^..compare
 
 ---
 

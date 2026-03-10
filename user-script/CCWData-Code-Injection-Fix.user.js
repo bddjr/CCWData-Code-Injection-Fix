@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         CCWData-Code-Injection-Fix
-// @version      cbf43b4e-{{version}}
+// @version      {{version}}-e7237e1f
 // @description  Fix CCWData code injection security vulnerability
 // @author       bddjr
 // @match        https://www.ccw.site/*
