@@ -67,10 +67,10 @@ jobs:
           cd $DIR
           git config user.name $GITHUB_ACTOR
           git config user.email $GITHUB_ACTOR@users.noreply.github.com
-          cp ../20260309.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.e7237e1f.prettyprint.js
+          cp ../references/20260309.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.js
           git add .
           git commit -m "before"
-          cp -f ../fix.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.e7237e1f.prettyprint.js
+          cp -f ../references/fix.scratch3_ccw_data.e7237e1f.prettyprint.js ./scratch3_ccw_data.js
           git add .
           git commit -m "fix"
           git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
