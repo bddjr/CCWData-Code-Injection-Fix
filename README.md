@@ -17,7 +17,7 @@ https://bddjr.github.io/CCWData-Code-Injection-Fix/CCWData-Code-Injection-Fix.us
 
 ---
 
-源代码在 `user-script` 文件夹。
+源代码在 `src` 文件夹。
 
 比较文件，以学习怎么修复漏洞:  
 https://github.com/bddjr/CCWData-Code-Injection-Fix/compare/compare^..compare
