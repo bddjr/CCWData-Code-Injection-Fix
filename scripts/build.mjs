@@ -1,13 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-
-/**
- * @param {string} p
- */
-function resolve(p) {
-    return fileURLToPath(import.meta.resolve(p))
-}
 
 // UTC+08:00
 const d = new Date(Date.now() + 28800000);
@@ -22,20 +14,20 @@ const version = ''.concat(
     d.getUTCSeconds().toString().padStart(2, '0')
 )
 
-let injectPrefix = fs.readFileSync(resolve('./inject-prefix.js')).toString()
+let injectPrefix = fs.readFileSync('src/inject-prefix.js').toString()
 
 injectPrefix = injectPrefix.replace(
     /[`\\]|\$\{|<\/script/g,
     m => (m == '</script' ? '<\\/script' : '\\' + m)
 ).replace(/;*\s*$/, '')
 
-let script = fs.readFileSync(resolve('./CCWData-Code-Injection-Fix.user.js')).toString()
+let script = fs.readFileSync('src/CCWData-Code-Injection-Fix.user.js').toString()
 
 script = script
     .replace('{{version}}', version)
     .replace('{{script}}', injectPrefix)
 
-const distPath = resolve('../dist')
+const distPath = 'dist'
 
 fs.existsSync(distPath) || fs.mkdirSync(distPath)
 
