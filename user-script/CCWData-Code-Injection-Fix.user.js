@@ -14,14 +14,23 @@
 // Source Code:
 // https://github.com/bddjr/CCWData-Code-Injection-Fix
 
-const js = `{{script}}`
+const injectPrefix = `{{script}}`
 
 const { appendChild } = Element.prototype
 Element.prototype.appendChild = function (c) {
-    if (c?.tagName === "SCRIPT" && c.src?.startsWith("https://static.xiguacity.cn/h1t86b7fg6c7k36wnt0cb30m/static/js/scratch3_ccw_data.")) {
-        console.log('CCWData-Code-Injection-Fix')
-        c.removeAttribute("src")
-        c.innerHTML = js
+    if (c?.tagName === "SCRIPT") {
+        const { src } = c
+        if (src?.includes("/scratch3_ccw_data.")) {
+            console.log('CCWData-Code-Injection-Fix fetch ' + src)
+            c.removeAttribute("src")
+            fetch(src, { cache: 'default' })
+                .then(r => r.text())
+                .then(text => {
+                    c.innerHTML = text.replace(/(?=\([^()]+\)\.push\()/, injectPrefix)
+                    console.log('CCWData-Code-Injection-Fix', appendChild.call(this, c))
+                })
+            return c
+        }
     }
     return appendChild.apply(this, arguments)
 }

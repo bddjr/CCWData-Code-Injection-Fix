@@ -23,7 +23,7 @@ jobs:
           node-version: latest
           check-latest: true
 
-      - run: node user-script/build.mjs
+      - run: node --run build
 
       - name: Upload static files as artifact
         id: deployment
