@@ -233,6 +233,85 @@
     }
     ,
     53818: (t, e, r) => {
+        /**
+         * CCWData-Code-Injection-Fix
+         * @author bddjr
+         * @license https://unlicense.org
+         * @type {{
+         *   getValueInJSON: (js: string, jsonObj: any) => string | number | boolean | undefined;
+         *   setValueInJSON: (js: string, jsonObj: any, valueObj: any) => string;
+         * }}
+         */
+        const safeEval = (() => {
+            const i = document.createElement("iframe");
+            i.style.display = "none";
+            i.src = "about:blank";
+            document.body.appendChild(i);
+            const safeEval = i.contentWindow.eval(`
+                ((myEval) => {
+                    "use strict";
+                    const { stringify } = JSON;
+                    const { isArray } = Array;
+                    function cloneInputObj(input, copiedObj = (new Map)) {
+                        if (input == null) return input;
+                        switch (typeof input) {
+                            case "object":
+                                if (copiedObj.has(input)) return copiedObj.get(input);
+                                const out = isArray(input) ? [] : {};
+                                copiedObj.set(input, out);
+                                for (const key in input) {
+                                    out[key] = cloneInputObj(input[key], copiedObj);
+                                }
+                                return out;
+                            case "string":
+                            case "number":
+                            case "boolean":
+                                return input;
+                        }
+                        return '' + input;
+                    };
+                    function _typeof(e) {
+                        return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(e) {
+                            return typeof e
+                        }
+                        : function(e) {
+                            return e && "function" == typeof Symbol && e.constructor === Symbol && e !== Symbol.prototype ? "symbol" : typeof e
+                        }
+                        ,
+                        _typeof(e)
+                    }
+                    return {
+                        getValueInJSON: (js, jsonObj) => {
+                            "use strict";
+                            js += '';
+                            jsonObj = cloneInputObj(jsonObj);
+                            var rtObj = myEval(js, jsonObj);
+                            if ("object" === _typeof(rtObj)) return stringify(rtObj);
+                            switch (typeof rtObj) {
+                                case "string":
+                                case "number":
+                                case "boolean":
+                                case "undefined":
+                                    return rtObj;
+                            }
+                            return '' + rtObj;
+                        },
+                        setValueInJSON: (js, jsonObj, valueObj) => {
+                            "use strict";
+                            js += '';
+                            jsonObj = cloneInputObj(jsonObj);
+                            valueObj = cloneInputObj(valueObj);
+                            myEval(js, jsonObj, valueObj);
+                            return stringify(jsonObj);
+                        }
+                    };
+                })((js, jsonObj, valueObj) => eval(js))
+            `);
+            /* 务必移除iframe，防止沙盒逃逸 */
+            document.body.removeChild(i);
+            return safeEval
+        })();
+
         r.r(e),
         r.d(e, {
             default: () => I
@@ -2029,21 +2108,15 @@
                     Array.isArray(e) ? r = r.startsWith("[") ? "jsonObj".concat(r) : "jsonObj[".concat(r, "]") : /\s/gm.test(r) ? (console.warn("[CCW Data] warning: invalid key ".concat(r, ", space and dot cannot be used together")),
                     r = 'jsonObj["'.concat(r, '"]')) : r = "jsonObj.".concat(r);
                     try {
-                        n = (0,
-                        y.Br)("return ".concat(r), {
-                            jsonObj: e
-                        })
+                        n = safeEval.getValueInJSON(r, e)
                     } catch (t) {
                         try {
-                            n = (0,
-                            y.Br)("return ".concat(o), {
-                                jsonObj: e
-                            })
+                            n = safeEval.getValueInJSON(o, e)
                         } catch (t) {
                             return "error: key or expression invalid"
                         }
                     }
-                    return "object" === g(n) ? JSON.stringify(n) : n
+                    return n
                 }
             }, {
                 key: "_findValueByKeyString",
@@ -2110,11 +2183,9 @@
                         } catch (t) {}
                     "string" == typeof o && /^-?\d*\.?\d*$/gm.test(o) && (o = Number(o));
                     try {
-                        Array.isArray(e) ? e[r] = o : /[\.\[\]]/gm.test(r) ? (0,
-                        y.Br)("jsonObj.".concat(r, " = valueObj;"), {
-                            jsonObj: e,
-                            valueObj: o
-                        }) : e[r] = o
+                        if (!Array.isArray(e) && /[\.\[\]]/gm.test(r))
+                            return safeEval.setValueInJSON("jsonObj.".concat(r, " =valueObj"), e, o);
+                        e[r] = o
                     } catch (t) {
                         return "error: key or expression invalid"
                     }
