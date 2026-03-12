@@ -46,7 +46,7 @@ Element.prototype.appendChild = function (c) {
                         case "text/x-javascript":
                             return r.text()
                     }
-                    throw `Refused to execute script from '${src}' because its MIME type ('${type}') is not executable.`
+                    throw Error(`Refused to execute script from '${src}' because its MIME type ('${type}') is not executable.`)
                 }).then(text => {
                     c.innerHTML = text.replace(/(?=\([^()]+\)\.push\()/, injectPrefix)
                     console.log('CCWData-Code-Injection-Fix', appendChild.call(this, c))
